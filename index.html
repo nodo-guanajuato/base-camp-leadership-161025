@@ -1,0 +1,430 @@
+<!-- Chosen Palette: Deep Space & Energy (#003f5c, #665191, #d45087, #f95d6a, #ff7c43, #ffa600) -->
+<!-- Application Structure Plan: The SPA is built around a 7-slide sequential navigation, controlled by a static sidebar/tabs on desktop and a vertical scroll indicator on mobile. This structure translates the linear flow of the presentation (Title -> Principle 1 -> Application -> Principle 2 -> Principle 3 -> Application -> Conclusion) into an intuitive, sectioned experience, prioritizing user control over the pace. -->
+<!-- Visualization & Content Choices: 1. Slide 2 (The Ancla) -> HTML/CSS Diagram -> Justification: Visual representation of chaos converging to a point is best handled by simple, dynamic CSS. 2. Slide 4 (Red de Poder) -> Chart.js Bubble Chart -> Justification: Clearly visualizes the quantitative difference in influence (size/bubble) vs. volume of connections. 3. Slide 6 (Riesgo) -> Chart.js Horizontal Bar Chart -> Justification: Provides a stark, immediate comparison of risk percentages based on the two decision methodologies. -->
+<!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Principios de Diseño: La Escalabilidad del Ser</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        .gradient-text {
+            background: linear-gradient(to right, #d45087, #ff7c43, #ffa600);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .slide-content {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+        .slide-content.active {
+            display: block;
+            opacity: 1;
+        }
+        .attractor-viz {
+            position: relative;
+            width: 100%;
+            height: 200px;
+            border: 2px solid #665191;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .chaos-path {
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background-color: #f95d6a;
+            animation: move-chaos 5s infinite alternate;
+        }
+        .converge-point {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: #ffa600;
+            box-shadow: 0 0 15px #ffa600;
+        }
+        @keyframes move-chaos {
+            0% { top: 10%; left: 10%; }
+            50% { top: 90%; left: 70%; }
+            100% { top: 50%; left: 50%; background-color: #665191; }
+        }
+    </style>
+</head>
+<body class="bg-[#003f5c] text-gray-200">
+
+    <div class="md:flex min-h-screen">
+        
+        <!-- Sidebar Navigation (7 Slides) -->
+        <nav class="bg-[#003f5c] md:w-64 p-6 flex md:flex-col items-center justify-center md:sticky top-0 z-10 border-b md:border-r border-white/10">
+            <h2 class="text-2xl font-black text-white mb-6 hidden md:block">7 Slides</h2>
+            <ul id="nav-list" class="flex md:flex-col space-x-3 md:space-x-0 md:space-y-3 overflow-x-auto pb-2 md:pb-0">
+                
+                <li><button data-slide="1" class="slide-nav px-4 py-2 text-sm md:text-base font-semibold rounded-lg bg-[#665191] text-white hover:bg-[#d45087] transition duration-200 shadow-md">1. Tesis</button></li>
+                <li><button data-slide="2" class="slide-nav px-4 py-2 text-sm md:text-base font-semibold rounded-lg bg-white/10 text-gray-300 hover:bg-[#d45087] hover:text-white transition duration-200 shadow-md">2. Atractor</button></li>
+                <li><button data-slide="3" class="slide-nav px-4 py-2 text-sm md:text-base font-semibold rounded-lg bg-white/10 text-gray-300 hover:bg-[#d45087] hover:text-white transition duration-200 shadow-md">3. Test</button></li>
+                <li><button data-slide="4" class="slide-nav px-4 py-2 text-sm md:text-base font-semibold rounded-lg bg-white/10 text-gray-300 hover:bg-[#d45087] hover:text-white transition duration-200 shadow-md">4. Red</button></li>
+                <li><button data-slide="5" class="slide-nav px-4 py-2 text-sm md:text-base font-semibold rounded-lg bg-white/10 text-gray-300 hover:bg-[#d45087] hover:text-white transition duration-200 shadow-md">5. Laboratorio</button></li>
+                <li><button data-slide="6" class="slide-nav px-4 py-2 text-sm md:text-base font-semibold rounded-lg bg-white/10 text-gray-300 hover:bg-[#d45087] hover:text-white transition duration-200 shadow-md">6. Simulación</button></li>
+                <li><button data-slide="7" class="slide-nav px-4 py-2 text-sm md:text-base font-semibold rounded-lg bg-white/10 text-gray-300 hover:bg-[#d45087] hover:text-white transition duration-200 shadow-md">7. Cierre</button></li>
+            </ul>
+        </nav>
+
+        <!-- Main Content Area -->
+        <div id="slide-container" class="flex-grow p-6 md:p-12">
+
+            <!-- Slide 1: Título y Tesis -->
+            <div id="slide-1" class="slide-content active max-w-4xl mx-auto">
+                <div class="text-center mb-12">
+                    <h1 class="text-5xl md:text-7xl font-black text-white mb-4">El Mundo Nunca Es Suficiente</h1>
+                    <h2 class="text-2xl md:text-3xl font-semibold gradient-text">Principios de Diseño para la Escalabilidad del Ser y del Negocio</h2>
+                    <p class="mt-4 text-xl text-gray-300">Dr. Edgar Valdés | Físico de la Complejidad & Líder Global de IA</p>
+                </div>
+
+                <div class="bg-white/10 rounded-xl p-8 shadow-xl border border-white/10">
+                    <h3 class="text-3xl font-bold mb-4 text-white">Dejar de Intentar, Empezar a Diseñar</h3>
+                    <p class="text-lg text-gray-300 mb-6">Si siente que trabaja muy duro y no escala, no es falta de esfuerzo. Es un problema de **diseño**. La vida y el negocio son sistemas. Los grandes líderes no gestionan la suerte, **diseñan la escalabilidad**.</p>
+                    
+                    <div class="flex justify-around items-center text-center mt-8 space-x-4">
+                        <div class="flex-1 p-4 bg-[#f95d6a]/20 rounded-lg border border-[#f95d6a]">
+                            <p class="text-xl font-bold text-[#f95d6a]">GESTIONAR (Laberinto)</p>
+                            <p class="text-sm text-gray-400 mt-1">Reacción al caos. Buscar el balance.</p>
+                        </div>
+                        <div class="text-4xl text-[#ffa600] font-black hidden sm:block">➔</div>
+                        <div class="flex-1 p-4 bg-[#665191]/20 rounded-lg border border-[#665191]">
+                            <p class="text-xl font-bold text-[#665191]">DISEÑAR (Escalera)</p>
+                            <p class="text-sm text-gray-400 mt-1">Crear sistemas. Buscar la convergencia.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 2: Principio 1 - El Ancla Innegociable -->
+            <div id="slide-2" class="slide-content max-w-4xl mx-auto">
+                <h3 class="text-4xl font-bold mb-6 text-white text-center">Principio 1: El Ancla Innegociable</h3>
+                <div class="grid md:grid-cols-2 gap-8 bg-white/10 rounded-xl p-8 shadow-xl border border-white/10">
+                    <div>
+                        <h4 class="text-2xl font-semibold gradient-text mb-4">La Ley Inmutable de la Convergencia</h4>
+                        <p class="mb-4 text-gray-300">En la ciencia de la complejidad, un sistema en caos necesita un **Atractor**—una fuerza que mantiene la trayectoria sin importar el ruido. Su Atractor es su **Ancla Innegociable**: su Ética y Propósito Central.</p>
+                        <p class="mb-6 text-gray-300">Esto es lo que le permite gobernar una crisis o un fracaso. Si su negocio colapsa, no colapsa usted. **Un líder firme siempre vuelve a converger.**</p>
+                         <div class="bg-[#d45087]/20 p-4 rounded-lg">
+                            <p class="text-lg font-semibold text-center text-[#ffa600]">Un líder sin Atractor colapsa. Un líder con Atractor <span class="font-black">converge</span>.</p>
+                        </div>
+                    </div>
+                    <div class="flex flex-col items-center justify-center">
+                        <div class="attractor-viz w-full">
+                            <div class="chaos-path" style="left: 10%; top: 20%; animation-delay: -1s;"></div>
+                            <div class="chaos-path" style="left: 80%; top: 80%; animation-delay: -3s;"></div>
+                            <div class="converge-point"></div>
+                        </div>
+                        <p class="mt-2 text-center text-sm text-gray-400">El ruido del entorno es absorbido por el núcleo de estabilidad.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 3: Aplicación I - Test de Convergencia -->
+            <div id="slide-3" class="slide-content max-w-4xl mx-auto">
+                <h3 class="text-4xl font-bold mb-6 text-white text-center">Aplicación: Test de Convergencia (3 Pilares)</h3>
+                <p class="text-lg text-gray-300 mb-8 text-center max-w-3xl mx-auto">Su Ancla Innegociable se diseña en tres pilares. Evalúe qué tan firme está cada uno de sus sistemas internos.</p>
+
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="bg-white/10 rounded-xl p-6 border-t-4 border-[#ffa600]">
+                        <p class="text-3xl font-black text-[#ffa600]">1. Ética Central</p>
+                        <p class="mt-2 text-gray-300">¿Qué principio es inquebrantable, incluso si cuesta dinero?</p>
+                    </div>
+                    <div class="bg-white/10 rounded-xl p-6 border-t-4 border-[#d45087]">
+                        <p class="text-3xl font-black text-[#d45087]">2. Propósito Sistémico</p>
+                        <p class="mt-2 text-gray-300">¿Cuál es el impacto a largo plazo que busca, más allá del éxito personal?</p>
+                    </div>
+                    <div class="bg-white/10 rounded-xl p-6 border-t-4 border-[#665191]">
+                        <p class="text-3xl font-black text-[#665191]">3. Valor No Negociable</p>
+                        <p class="mt-2 text-gray-300">¿Qué tipo de trabajo/socio/cliente rechazaría de inmediato por diseño?</p>
+                    </div>
+                </div>
+                <p class="text-xl font-semibold text-center mt-8 text-white max-w-3xl mx-auto">El liderazgo no es sobre lo que acepta; es sobre **lo que rechaza por diseño**.</p>
+            </div>
+
+            <!-- Slide 4: Principio 2 - Red de Socios Estratégicos -->
+            <div id="slide-4" class="slide-content max-w-4xl mx-auto">
+                <h3 class="text-4xl font-bold mb-6 text-white text-center">Principio 2: Red de Socios Estratégicos</h3>
+                <div class="grid md:grid-cols-2 gap-8 bg-white/10 rounded-xl p-8 shadow-xl border border-white/10">
+                    <div>
+                        <h4 class="text-2xl font-semibold gradient-text mb-4">Mapeando el 'Poder de Flujo'</h4>
+                        <p class="mb-4 text-gray-300">Deje de perder tiempo en el 'networking' tradicional. El crecimiento no viene de tener 100 contactos, sino de tener **los 3 socios correctos**. En **Teoría de Redes**, medimos el **Poder de Flujo**.</p>
+                        <p class="mb-6 text-gray-300">Un **Socio Estratégico** (Nodo Crítico) es aquel que, con una inversión mínima de su tiempo, le da acceso al mayor **Flujo de Oportunidades**.</p>
+                         <div class="bg-[#665191]/20 p-4 rounded-lg">
+                            <p class="text-lg font-semibold text-center text-[#ffa600]">Deje de coleccionar tarjetas; diseñe su <span class="font-black">Red de Poder</span>.</p>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="networkChart"></canvas>
+                        <p class="mt-2 text-center text-sm text-gray-400">Visualización de red: el valor está concentrado en pocos nodos.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 5: Principio 3 - El Laboratorio de Consecuencias -->
+            <div id="slide-5" class="slide-content max-w-4xl mx-auto">
+                <h3 class="text-4xl font-bold mb-6 text-white text-center">Principio 3: El Laboratorio de Consecuencias</h3>
+                <div class="grid md:grid-cols-2 gap-8 bg-white/10 rounded-xl p-8 shadow-xl border border-white/10">
+                    <div>
+                        <h4 class="text-2xl font-semibold gradient-text mb-4">El Gemelo Digital de su Decisión</h4>
+                        <p class="mb-4 text-gray-300">El riesgo no se teme, se cuantifica y se reduce. La IA, a través de **Gemelos Digitales** (como los que usamos en *Polisplexity*), le permite simular el futuro de sus decisiones.</p>
+                        <p class="mb-6 text-gray-300">La IA es su **Laboratorio de Consecuencias**. Mueva su estrategia de la intuición al **modelado predictivo**.</p>
+                         <div class="bg-[#d45087]/20 p-4 rounded-lg">
+                            <p class="text-lg font-semibold text-center text-[#ffa600]">La intuición es una hipótesis. La simulación es <span class="font-black">evidencia</span>.</p>
+                        </div>
+                    </div>
+                    <div class="flex flex-col items-center justify-center p-4">
+                        <div class="bg-[#003f5c] p-6 rounded-xl border-4 border-[#ff7c43]">
+                            <p class="text-lg font-semibold text-white">Modelo de Simulación</p>
+                            <p class="text-sm text-gray-400">Escenarios contrafactuales:</p>
+                            <ul class="list-disc list-inside mt-2 space-y-1 text-gray-300">
+                                <li>Decisión A: +30% inversión / -50% margen</li>
+                                <li>Decisión B: -10% inversión / +80% margen</li>
+                                <li>Decisión C: Riesgo Cuantificado...</li>
+                            </ul>
+                            <p class="text-sm text-center mt-3 text-[#ffa600]">La IA revela el camino óptimo.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 6: Aplicación III - Simular 100 Veces, Actuar 1 -->
+            <div id="slide-6" class="slide-content max-w-4xl mx-auto">
+                <h3 class="text-4xl font-bold mb-6 text-white text-center">Aplicación: Simular 100 Veces, Actuar 1</h3>
+                <p class="text-lg text-gray-300 mb-8 text-center max-w-3xl mx-auto">Antes de invertir o pivotar, simule **100 escenarios contrafactuales**. Pregunte a la IA: "¿Qué probabilidad hay de fracaso si tomo la Decisión A versus la Decisión B?". Esto le permite **cuantificar el riesgo**, no adivinarlo.</p>
+
+                <div class="chart-container">
+                    <canvas id="riskChart"></canvas>
+                    <p class="mt-2 text-center text-sm text-gray-400">El líder inteligente elimina el riesgo, no lo toma.</p>
+                </div>
+
+                <p class="text-xl font-semibold text-center mt-8 text-white max-w-3xl mx-auto">El líder no es valiente por tomar riesgos; es inteligente por **eliminarlos**.</p>
+            </div>
+
+            <!-- Slide 7: Conclusión Final y Contacto -->
+            <div id="slide-7" class="slide-content max-w-4xl mx-auto text-center">
+                <h3 class="text-5xl font-black gradient-text mb-6">La Declaración del Diseñador</h3>
+                <p class="text-2xl font-semibold text-white mb-10">La vida y el negocio se diseñan, no se improvisan.</p>
+
+                <div class="flex flex-col md:flex-row justify-center items-center space-y-6 md:space-y-0 md:space-x-12">
+                    <div class="flex flex-col items-center">
+                        <div class="step-circle bg-[#ffa600]">1</div>
+                        <p class="font-bold text-xl mt-2 text-white">El Ser</p>
+                        <p class="text-sm text-gray-400">Defina su Ancla Innegociable</p>
+                    </div>
+                    <div class="text-4xl text-gray-500 font-black hidden md:block">|</div>
+                    <div class="flex flex-col items-center">
+                        <div class="step-circle bg-[#d45087]">2</div>
+                        <p class="font-bold text-xl mt-2 text-white">La Red</p>
+                        <p class="text-sm text-gray-400">Mida sus Nodos Críticos</p>
+                    </div>
+                    <div class="text-4xl text-gray-500 font-black hidden md:block">|</div>
+                    <div class="flex flex-col items-center">
+                        <div class="step-circle bg-[#665191]">3</div>
+                        <p class="font-bold text-xl mt-2 text-white">La Decisión</p>
+                        <p class="text-sm text-gray-400">Modele sus Consecuencias</p>
+                    </div>
+                </div>
+
+                <p class="mt-12 text-3xl font-black text-[#ffa600]">¡Diseñen Sistemas que el mundo nunca considere suficientes!</p>
+                <div class="mt-8 border-t border-white/10 pt-6">
+                    <h4 class="text-xl font-bold text-white mb-2">Q&A: Pregúntele al Diseñador de Sistemas</h4>
+                    <p class="text-lg text-gray-400">Dr. Edgar Valdés</p>
+                    <p class="text-lg text-gray-400">edgar@hadox.org | LinkedIn: /in/ekaropolus</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        let currentSlide = 1;
+        const totalSlides = 7;
+        const slides = document.querySelectorAll('.slide-content');
+        const navButtons = document.querySelectorAll('.slide-nav');
+
+        const showSlide = (index) => {
+            slides.forEach((slide, i) => {
+                slide.classList.remove('active');
+                if (i + 1 === index) {
+                    slide.classList.add('active');
+                }
+            });
+            navButtons.forEach(button => {
+                button.classList.remove('bg-[#665191]', 'text-white');
+                button.classList.add('bg-white/10', 'text-gray-300');
+                if (parseInt(button.dataset.slide) === index) {
+                    button.classList.add('bg-[#665191]', 'text-white');
+                    button.classList.remove('bg-white/10', 'text-gray-300');
+                }
+            });
+            currentSlide = index;
+        };
+
+        navButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                showSlide(parseInt(button.dataset.slide));
+            });
+        });
+
+        const processLabels = (labels, maxLength = 16) => {
+            return labels.map(label => {
+                if (label.length <= maxLength) {
+                    return label;
+                }
+                const words = label.split(' ');
+                const lines = [];
+                let currentLine = '';
+                words.forEach(word => {
+                    if ((currentLine + ' ' + word).trim().length > maxLength && currentLine.length > 0) {
+                        lines.push(currentLine.trim());
+                        currentLine = '';
+                    }
+                    currentLine += word + ' ';
+                });
+                lines.push(currentLine.trim());
+                return lines.filter(line => line.length > 0);
+            });
+        };
+
+        const tooltipTitleCallback = (tooltipItems) => {
+            const item = tooltipItems[0];
+            let label = item.chart.data.labels[item.dataIndex];
+            if (Array.isArray(label)) {
+                return label.join(' ');
+            } else {
+                return label;
+            }
+        };
+
+        const palette = {
+            primary: '#665191',
+            secondary: '#d45087',
+            tertiary: '#f95d6a',
+            accent: '#ffa600',
+            light: 'rgba(255, 255, 255, 0.7)',
+            grid: 'rgba(255, 255, 255, 0.1)'
+        };
+
+        const networkChartCtx = document.getElementById('networkChart').getContext('2d');
+        new Chart(networkChartCtx, {
+            type: 'bubble',
+            data: {
+                datasets: [{
+                    label: 'Nodo Crítico de Valor',
+                    data: [{ x: 25, y: 40, r: 30, name: 'Socio Estratégico A' }, { x: 50, y: 65, r: 35, name: 'Socio Estratégico B' }, { x: 75, y: 30, r: 28, name: 'Socio Estratégico C' }],
+                    backgroundColor: palette.secondary,
+                    borderColor: palette.accent,
+                    borderWidth: 2,
+                }, {
+                    label: 'Contacto de Bajo Impacto',
+                    data: Array.from({ length: 25 }, () => ({
+                        x: Math.random() * 100,
+                        y: Math.random() * 100,
+                        r: Math.random() * 6 + 2
+                    })),
+                    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: { display: false },
+                    y: { display: false }
+                },
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { color: palette.light }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            title: function(tooltipItems) {
+                                return tooltipItems[0].dataset.label;
+                            },
+                            label: function(context) {
+                                if (context.datasetIndex === 0) {
+                                    return context.raw.name;
+                                }
+                                return context.dataset.label;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        const riskChartCtx = document.getElementById('riskChart').getContext('2d');
+        new Chart(riskChartCtx, {
+            type: 'bar',
+            data: {
+                labels: processLabels(['Probabilidad de Fracaso: Intuición', 'Probabilidad de Fracaso: Modelo IA']),
+                datasets: [{
+                    label: 'Probabilidad de Fracaso (%)',
+                    data: [90, 10],
+                    backgroundColor: [palette.tertiary, palette.primary],
+                    borderColor: palette.accent,
+                    borderWidth: 2,
+                    borderRadius: 5,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                indexAxis: 'y',
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        max: 100,
+                        grid: { color: palette.grid },
+                        ticks: { color: palette.light, font: { weight: '600' } }
+                    },
+                    y: {
+                        grid: { display: false },
+                        ticks: { color: palette.light, font: { size: 14, weight: '600' } }
+                    }
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            title: tooltipTitleCallback
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
